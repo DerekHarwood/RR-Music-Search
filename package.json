@@ -9,8 +9,8 @@
     "axios": "^0.27.2",
     "cors": "^2.8.5",
     "nodemon": "^2.0.19",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^0.0.0-experimental-3d615fc14-20220919",
+    "react-dom": "^0.0.0-experimental-3d615fc14-20220919",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.0",
     "web-vitals": "^2.1.4"
