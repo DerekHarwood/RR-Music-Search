@@ -1,56 +1,55 @@
-import { useEffect, useState, Suspense,  useRef } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { useState, Suspense, useRef } from 'react'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import ArtistView from './components/ArtistView'
+import AlbumView from './components/AlbumView'
 import Gallery from './components/Gallery'
 import SearchBar from './components/SearchBar'
-import AlbumView from './components/AlbumView'
-import ArtistView from './components/ArtistView'
+import Spinner from './components/Spinner'
 import { DataContext } from './context/DataContext'
 import { SearchContext } from './context/SearchContext'
 import { createResource as fetchData } from './helper'
-import Spinner from './components/Spinner'
 
-function App() {
-    let [search, setSearch] = useState('')
-    let [message, setMessage] = useState('Search for Music!')
-    let [data, setData] = useState(null)
-    let searchInput = useRef('')
+const App = () => {
+  let searchInput = useRef('')
+  let [data, setData] = useState(null)
+  let [message, setMessage] = useState('Search for Music!')
 
-    const API_URL = 'https://itunes.apple.com/search?term='    
-    
-    const handleSearch = (e, term) => {
-        e.preventDefault()
-      if(term){
-        setData(fetchData(term));
-       }
+  const handleSearch = (e, term) => {
+    e.preventDefault()
+    setData(fetchData(term, 'main'))
+  }
+
+  const renderGallery = () => {
+    if(data) {
+      return (
+        <Suspense fallback={<Spinner />}>
+          <Gallery />
+        </Suspense>
+      )
     }
+  }
 
-    const renderGallery = () => {
-        if(data){
-            return (
-                <Suspense fallback={<Spinner />} >
-                    <Gallery data={data} />
-                </Suspense>
-            )
-        }
-
-
-    
-    return (
-        <div className="App">
-            {message}
-            {renderGallery()}
-
-            <SearchContext.Provider value={{
-                term: searchInput
-                }}>
-                <SearchBar handleSearch={handleSearch} />
-            </SearchContext.Provider>
-           
+  return (
+    <div className="App">
+      {message}
+      <Router>
+        <Route exact path={'/'}>
+          <SearchContext.Provider value={{term: searchInput, handleSearch: handleSearch}}>
+            <SearchBar />
+          </SearchContext.Provider>
             <DataContext.Provider value={data}>
-                <Gallery />
+              {renderGallery()}
             </DataContext.Provider>
-        </div>
-    );
-}}
+        </Route>
+        <Route path="/album/:id">
+          <AlbumView />
+        </Route>
+        <Route path="/artist/:id">
+          <ArtistView />
+        </Route>
+      </Router>
+    </div>
+  );
+}
 
-export default App
+export default App;
